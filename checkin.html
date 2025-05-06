@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Warehouse Check-In</title>
+  <script>
+    function submitAttendance() {
+      const name = document.getElementById("name").value;
+      if (!name) {
+        alert("Please enter your name");
+        return;
+      }
+
+      if (!navigator.geolocation) {
+        alert("Geolocation is not supported by your browser");
+        return;
+      }
+
+      navigator.geolocation.getCurrentPosition(position => {
+        const data = {
+          name: name,
+          latitude: position.coords.latitude,
+          longitude: position.coords.longitude,
+          timestamp: new Date().toISOString()
+        };
+
+        fetch("https://script.google.com/macros/s/AKfycbwTxWuJtM3HwSqx8nCih213uacsqptSwOnEYrJvNyRpOoBmEn2QMYtNX_v-krKLgjAQ/exec", {
+          method: "POST",
+          mode: "no-cors",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify(data)
+        });
+
+        alert("Check-in successful!");
+        document.getElementById("name").value = "";
+      });
+    }
+  </script>
+</head>
+<body>
+  <h2>Warehouse Check-In</h2>
+  <label>Name:</label>
+  <input type="text" id="name" placeholder="Enter your name" />
+  <button onclick="submitAttendance()">Check In</button>
+</body>
+</html>
