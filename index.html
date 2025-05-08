@@ -1,9 +1,15 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Warehouse Check-In</title>
+  <title>Warehouse Attendance</title>
   <script>
-    function submitAttendance() {
+    async function getIP() {
+      const res = await fetch("https://api.ipify.org?format=json");
+      const data = await res.json();
+      return data.ip;
+    }
+
+    function handleCheck(action) {
       const name = document.getElementById("name").value;
       if (!name) {
         alert("Please enter your name");
@@ -15,15 +21,18 @@
         return;
       }
 
-      navigator.geolocation.getCurrentPosition(position => {
+      navigator.geolocation.getCurrentPosition(async (position) => {
+        const ip = await getIP();
         const data = {
           name: name,
           latitude: position.coords.latitude,
           longitude: position.coords.longitude,
-          timestamp: new Date().toISOString()
+          timestamp: new Date().toISOString(),
+          action: action,
+          ip: ip
         };
 
-        fetch("https://script.google.com/macros/s/AKfycbwTxWuJtM3HwSqx8nCih213uacsqptSwOnEYrJvNyRpOoBmEn2QMYtNX_v-krKLgjAQ/exec", {
+        fetch("https://script.google.com/macros/s/AKfycbwAZXCFnTpu5mFfEjyuW_0XfpqDpeBv9sZ9ANbUcE-lTN3zBFWgNte83--eBT0nPDbn/exec", {
           method: "POST",
           mode: "no-cors",
           headers: {
@@ -32,16 +41,18 @@
           body: JSON.stringify(data)
         });
 
-        alert("Check-in successful!");
+        alert(`Checked ${action} successfully!`);
         document.getElementById("name").value = "";
       });
     }
   </script>
 </head>
 <body>
-  <h2>Warehouse Check-In</h2>
+  <h2>Warehouse Attendance</h2>
   <label>Name:</label>
   <input type="text" id="name" placeholder="Enter your name" />
-  <button onclick="submitAttendance()">Check In</button>
+  <br><br>
+  <button onclick="handleCheck('in')">Check In</button>
+  <button onclick="handleCheck('out')">Check Out</button>
 </body>
 </html>
