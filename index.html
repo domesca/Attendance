@@ -19,17 +19,12 @@
   </style>
   <script>
     async function getIP() {
-      try {
-        const res = await fetch("https://api.ipify.org?format=json");
-        const data = await res.json();
-        return data.ip;
-      } catch (err) {
-        alert("Unable to retrieve IP address.");
-        return "unknown";
-      }
+      const res = await fetch("https://api.ipify.org?format=json");
+      const data = await res.json();
+      return data.ip;
     }
 
-    async function handleCheck(action) {
+    function handleCheck(action) {
       const name = document.getElementById("name").value;
       if (!name) {
         alert("Please enter your name");
@@ -54,19 +49,14 @@
 
         fetch("https://script.google.com/macros/s/AKfycbyi3dNx5dXnF2GTaPEZ2hFVOdZrhkepO-52set6TuvQUPZpG6Yl_i8MvRfW0Gg7UWPEQA/exec", {
           method: "POST",
+          mode: "no-cors",
           headers: {
             "Content-Type": "application/json"
           },
           body: JSON.stringify(data)
-        })
-        .then(res => res.text())
-        .then(text => {
-          alert(text); // shows success or already checked
-        })
-        .catch(err => {
-          alert("Error submitting check: " + err);
         });
 
+        alert(Checked ${action} successfully!);
         document.getElementById("name").value = "";
       });
     }
