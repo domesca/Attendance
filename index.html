@@ -54,19 +54,18 @@
 
         fetch("https://script.google.com/macros/s/AKfycbyi3dNx5dXnF2GTaPEZ2hFVOdZrhkepO-52set6TuvQUPZpG6Yl_i8MvRfW0Gg7UWPEQA/exec", {
           method: "POST",
-            mode: "no-cors",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify(data)
-        })
-        .then(res => res.text())
-        .then(text => {
-          alert(text); // shows success or already checked
-        })
-        .catch(err => {
-          alert("Error submitting check: " + err);
-        });
+             mode: "no-cors",
+  headers: {
+    "Content-Type": "application/json"
+  },
+  body: JSON.stringify(data)
+})
+.then(() => {
+  alert(`Checked ${action} successfully!`);
+})
+.catch(err => {
+  alert("Error submitting check: " + err);
+});
 
         document.getElementById("name").value = "";
       });
