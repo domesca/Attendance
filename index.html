@@ -2,6 +2,21 @@
 <html>
 <head>
   <title>Warehouse Attendance</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding: 40px;
+    }
+    input, button {
+      font-size: 1.2em;
+      margin: 10px;
+      padding: 10px;
+    }
+    button {
+      cursor: pointer;
+    }
+  </style>
   <script>
     async function getIP() {
       const res = await fetch("https://api.ipify.org?format=json");
@@ -32,7 +47,7 @@
           ip: ip
         };
 
-        fetch("https://script.google.com/macros/s/AKfycbwAZXCFnTpu5mFfEjyuW_0XfpqDpeBv9sZ9ANbUcE-lTN3zBFWgNte83--eBT0nPDbn/exec", {
+        fetch("YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL", {
           method: "POST",
           mode: "no-cors",
           headers: {
@@ -49,7 +64,7 @@
 </head>
 <body>
   <h2>Warehouse Attendance</h2>
-  <label>Name:</label>
+  <label for="name">Name:</label>
   <input type="text" id="name" placeholder="Enter your name" />
   <br><br>
   <button onclick="handleCheck('in')">Check In</button>
