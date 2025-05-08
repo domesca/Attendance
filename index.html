@@ -2,56 +2,58 @@
 <html>
 <head>
   <title>Warehouse Attendance</title>
+  <style>
+    body { font-family: Arial; text-align: center; padding: 40px; }
+    input, button { padding: 10px; margin: 10px; font-size: 1em; }
+  </style>
   <script>
     async function getIP() {
-      const res = await fetch("https://api.ipify.org?format=json");
-      const data = await res.json();
-      return data.ip;
+      try {
+        const res = await fetch("https://api.ipify.org?format=json");
+        const data = await res.json();
+        return data.ip;
+      } catch {
+        return "unknown";
+      }
     }
 
-    function handleCheck(action) {
+    async function handleCheck(action) {
       const name = document.getElementById("name").value;
       if (!name) {
         alert("Please enter your name");
         return;
       }
 
-      if (!navigator.geolocation) {
-        alert("Geolocation is not supported by your browser");
-        return;
-      }
-
-      navigator.geolocation.getCurrentPosition(async (position) => {
+      navigator.geolocation.getCurrentPosition(async (pos) => {
         const ip = await getIP();
         const data = {
           name: name,
-          latitude: position.coords.latitude,
-          longitude: position.coords.longitude,
+          latitude: pos.coords.latitude,
+          longitude: pos.coords.longitude,
           timestamp: new Date().toISOString(),
-          action: action,
-          ip: ip
+          ip: ip,
+          action: action
         };
 
         fetch("https://script.google.com/macros/s/AKfycbyi3dNx5dXnF2GTaPEZ2hFVOdZrhkepO-52set6TuvQUPZpG6Yl_i8MvRfW0Gg7UWPEQA/exec", {
           method: "POST",
-          mode: "no-cors",
-          headers: {
-            "Content-Type": "application/json"
-          },
+          mode: "no-cors", // silent but reliable
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify(data)
         });
 
-        alert(`Checked ${action} successfully!`);
+        alert(`Check ${action === "in" ? "in" : "out"} submitted.`);
         document.getElementById("name").value = "";
       });
     }
   </script>
 </head>
 <body>
+  <h2>Across Land</h2>
   <h2>Warehouse Attendance</h2>
   <label>Name:</label>
   <input type="text" id="name" placeholder="Enter your name" />
-  <br><br>
+  <br>
   <button onclick="handleCheck('in')">Check In</button>
   <button onclick="handleCheck('out')">Check Out</button>
 </body>
