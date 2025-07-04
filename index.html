@@ -6,6 +6,18 @@
     body { font-family: Arial; text-align: center; padding: 40px; }
     input, button { padding: 10px; margin: 10px; font-size: 1em; }
   </style>
+</head>
+<body>
+  <h2>Warehouse Attendance</h2>
+  <div>
+    <label for="name">Name:</label>
+    <input id="name" type="text" required />
+  </div>
+  <div>
+    <button onclick="handleSubmit('in')">Check In</button>
+    <button onclick="handleSubmit('out')">Check Out</button>
+  </div>
+
   <script>
     async function getIP() {
       try {
@@ -17,64 +29,46 @@
       }
     }
 
-    async function sendData(data) {
+    async function handleSubmit(action) {
+      const name = document.getElementById("name").value.trim();
+      if (!name) {
+        alert("Please enter your name.");
+        return;
+      }
+
+      const ip = await getIP();
+      const timestamp = new Date();
+      const position = await new Promise((resolve) => {
+        navigator.geolocation.getCurrentPosition(
+          (pos) => resolve(pos.coords),
+          () => resolve({ latitude: 0, longitude: 0 }),
+          { timeout: 5000 }
+        );
+      });
+
+      const data = {
+        name,
+        ip,
+        timestamp,
+        latitude: position.latitude,
+        longitude: position.longitude,
+        action
+      };
+
       try {
-        const response = await fetch("https://script.google.com/macros/s/AKfycbxkMMHaA2Uoeiq6gFxXaykDWmTnz46Sv3wXqOOLAItiZZhIwX6TxVaYeM6wb8vVYG3fRQ/exec", {
+        const response = await fetch("https://script.google.com/macros/s/AKfycbwBsZTHa6OAJ7RGzCf3_FM76h7h3Knf8srjgKhv687g2-yIzBTAh_fGeYJTBFfE6-NO4A/exec", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(data)
         });
+
         const text = await response.text();
-        alert(text);
-      } catch (error) {
-        console.error(error);
+        alert("Server says: " + text);
+      } catch (err) {
+        console.error(err);
         alert("Failed to submit attendance. Please try again.");
       }
     }
-
-    async function handleCheck(action) {
-      const name = document.getElementById("name").value;
-      if (!name) {
-        alert("Please enter your name");
-        return;
-      }
-
-      navigator.geolocation.getCurrentPosition(async (pos) => {
-        const ip = await getIP();
-        const data = {
-          name: name,
-          latitude: pos.coords.latitude,
-          longitude: pos.coords.longitude,
-          timestamp: new Date().toISOString(),
-          ip: ip,
-          action: action
-        };
-        await sendData(data);
-        document.getElementById("name").value = "";
-      }, async (err) => {
-        alert("Could not get location. Sending without it.");
-        const ip = await getIP();
-        const data = {
-          name: name,
-          latitude: "unknown",
-          longitude: "unknown",
-          timestamp: new Date().toISOString(),
-          ip: ip,
-          action: action
-        };
-        await sendData(data);
-        document.getElementById("name").value = "";
-      });
-    }
   </script>
-</head>
-<body>
-  <h2>Across Land</h2>
-  <h2>Warehouse Attendance</h2>
-  <label>Name:</label>
-  <input type="text" id="name" placeholder="Enter your name" />
-  <br>
-  <button onclick="handleCheck('in')">Check In</button>
-  <button onclick="handleCheck('out')">Check Out</button>
 </body>
 </html>
