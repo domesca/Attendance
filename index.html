@@ -37,12 +37,12 @@
 
         fetch("https://script.google.com/macros/s/AKfycbxWrrQuCS-Ccjih2wcoc9j3owYKNLSfBZnUoeLCNHfNSc2XCpzS-2lOk9sdiuFDaUaG9g/exec", {
           method: "POST",
-          mode: "no-cors", // silent but reliable
+          mode: "no-cors",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(data)
         });
 
-        alert(Check ${action === "in" ? "in" : "out"} submitted.);
+        alert(`Check ${action === "in" ? "in" : "out"} submitted.`);
         document.getElementById("name").value = "";
       });
     }
