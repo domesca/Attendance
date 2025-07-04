@@ -1,66 +1,62 @@
-<!DOCTYPE html>
 <html>
 <head>
   <title>Warehouse Attendance</title>
+  <style>
+    body { font-family: Arial; text-align: center; padding: 40px; }
+    input, button { padding: 10px; margin: 10px; font-size: 1em; }
+  </style>
   <script>
-    async function sendData(action) {
-      const name = document.getElementById('name').value;
+    async function getIP() {
+      try {
+        const res = await fetch("https://api.ipify.org?format=json");
+        const data = await res.json();
+        return data.ip;
+      } catch {
+        return "unknown";
+      }
+    }
+
+    async function handleCheck(action) {
+      const name = document.getElementById("name").value;
       if (!name) {
-        alert("Please enter your name.");
+        alert("Please enter your name");
         return;
       }
 
-      const getIP = async () => {
-        try {
-          const res = await fetch("https://api.ipify.org?format=json");
-          const data = await res.json();
-          return data.ip;
-        } catch (e) {
-          return "Unavailable";
-        }
-      };
-
-      navigator.geolocation.getCurrentPosition(async (position) => {
-        const latitude = position.coords.latitude;
-        const longitude = position.coords.longitude;
+      navigator.geolocation.getCurrentPosition(async (pos) => {
         const ip = await getIP();
+        const data = {
+          name: name,
+          latitude: pos.coords.latitude,
+          longitude: pos.coords.longitude,
+          timestamp: new Date().toISOString(),
+          ip: ip,
+          action: action
+        };
 
-        const formData = new FormData();
-        formData.append("name", name);
-        formData.append("latitude", latitude);
-        formData.append("longitude", longitude);
-        formData.append("ip", ip);
-        formData.append("action", action);
-
-        fetch("https://script.google.com/macros/s/AKfycbxehRCuFktgbI2s4eDvS5NxqIsuyUm2hCgN236Zz9jeb-Qe8RybnTlmcvdwLXjdWxFqtA/exec", {
+        fetch("https://script.google.com/macros/s/AKfycbzUlCEpfkVWkx3ibbCLOr4vIEB8YItG78yI0XGbcAYJtsfSUSb4Nt7dhhG5fDL1-6ZEFw/exec", {
           method: "POST",
-          body: formData
-        })
-        .then(res => res.text())
-        .then(response => {
-          if (response.includes("Success")) {
-            alert("Attendance submitted successfully.");
-          } else {
-            alert("Failed to submit attendance. Please try again.");
-            console.error(response);
-          }
-        })
-        .catch(error => {
-          alert("Error submitting attendance.");
-          console.error("Submission error:", error);
+          mode: "no-cors", // silent but reliable
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(data)
         });
-      }, () => {
-        alert("Location access denied.");
+
+        alert(Check ${action === "in" ? "in" : "out"} submitted.);
+        document.getElementById("name").value = "";
       });
     }
   </script>
 </head>
 <body>
+  <h2>Across Land</h2>
   <h2>Warehouse Attendance</h2>
-  <label for="name">Name:</label>
-  <input type="text" id="name" />
-  <br><br>
-  <button onclick="sendData('checkin')">Check In</button>
-  <button onclick="sendData('checkout')">Check Out</button>
+  <label>Name:</label>
+  <input type="text" id="name" placeholder="Enter your name" />
+  <br>
+  <button onclick="handleCheck('in')">Check In</button>
+  <button onclick="handleCheck('out')">Check Out</button>
 </body>
 </html>
+
+
+
