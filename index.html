@@ -9,11 +9,9 @@
 </head>
 <body>
   <h2>Warehouse Attendance</h2>
-  <label for="name">Name:</label>
-  <input id="name" type="text" placeholder="Enter name" />
-  <br />
-  <button onclick="handleSubmit('in')">Check In</button>
-  <button onclick="handleSubmit('out')">Check Out</button>
+  <label>Name: <input type="text" id="name"></label><br>
+  <button onclick="submit('in')">Check In</button>
+  <button onclick="submit('out')">Check Out</button>
 
   <script>
     async function getIP() {
@@ -26,44 +24,38 @@
       }
     }
 
-    async function handleSubmit(action) {
+    async function submit(action) {
       const name = document.getElementById("name").value.trim();
       if (!name) {
         alert("Please enter a name.");
         return;
       }
 
-      if (!navigator.geolocation) {
-        alert("Geolocation is not supported.");
-        return;
-      }
-
-      navigator.geolocation.getCurrentPosition(async position => {
+      try {
         const ip = await getIP();
-        const data = {
-          name,
-          timestamp: Date.now(),
-          latitude: position.coords.latitude,
-          longitude: position.coords.longitude,
-          ip,
-          action
-        };
+        navigator.geolocation.getCurrentPosition(async (position) => {
+          const payload = {
+            name,
+            timestamp: new Date().toISOString(),
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude,
+            ip,
+            action
+          };
 
-        try {
           const response = await fetch("https://script.google.com/macros/s/AKfycbwhISyApN7wyvYMQHebv6zGFJUGXKtENCcVWF7C_7S2PEiZ8QjNh4xHSL5aRRupPG79Ww/exec", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(data)
+            body: JSON.stringify(payload)
           });
+
           const text = await response.text();
-          alert(text.includes("Success") ? "Attendance recorded!" : text);
-        } catch (err) {
-          console.error(err);
-          alert("Failed to submit attendance. Please try again.");
-        }
-      }, err => {
-        alert("Error getting location: " + err.message);
-      });
+          alert(text);
+        }, () => alert("Location permission denied."));
+      } catch (err) {
+        console.error(err);
+        alert("Failed to submit attendance. Please try again.");
+      }
     }
   </script>
 </body>
