@@ -37,7 +37,7 @@
 
         fetch("https://script.google.com/macros/s/AKfycbzVw_Wbi3v748cMbHCm4cXgsolTVu0ZmnnTwDJEYuGgvZWca9H3yBbfNNvTH6BbOp2dwg/exec", {
           method: "POST",
-          mode: "no-cors", // silent but reliable
+          mode: "no-cors",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(data)
         });
@@ -58,5 +58,3 @@
   <button onclick="handleCheck('out')">Check Out</button>
 </body>
 </html>
-
-
