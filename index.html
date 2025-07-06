@@ -2,25 +2,17 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Across Land - Warehouse Attendance</title>
+  <title>Across Land – Warehouse Attendance</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      text-align: center;
-      padding: 40px;
-    }
-    input, button {
-      font-size: 18px;
-      padding: 10px;
-      margin: 10px;
-    }
+    body { font-family: Arial, sans-serif; text-align: center; padding: 40px; }
+    input, button { font-size: 18px; padding: 10px; margin: 10px; }
   </style>
 </head>
 <body>
   <h2>Across Land</h2>
   <h3>Warehouse Attendance</h3>
   <label for="name">Name:</label>
-  <input type="text" id="name" placeholder="Enter your name" autocomplete="name" />
+  <input type="text" id="name" placeholder="Enter your name" autocomplete="name">
   <br>
   <button onclick="submitAttendance('in')">Check In</button>
   <button onclick="submitAttendance('out')">Check Out</button>
@@ -29,31 +21,26 @@
     async function submitAttendance(status) {
       const name = document.getElementById("name").value.trim();
       if (!name) return alert("Please enter your name.");
-
-      try {
-        const timestamp = new Date().toISOString();
-        const ipRes = await fetch("https://api.ipify.org?format=json");
-        const ipData = await ipRes.json();
-
-        navigator.geolocation.getCurrentPosition(async (pos) => {
-          const location = `${pos.coords.latitude},${pos.coords.longitude}`;
-
-          const response = await fetch("https://script.google.com/macros/s/AKfycbyT3lpAA4i7PtOnqjnugLzFsV9RXbgaAHjJmrsz-5_3eBFny7cRAxPOIoSoD7w9qlh2_A/exec", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ name, status, timestamp, location, ip: ipData.ip })
-          });
-
-          const result = await response.text();
-          alert(result);
-
-        }, () => {
-          alert("Location permission denied.");
+      
+      const timestamp = new Date().toISOString();
+      const ipRes    = await fetch("https://script.google.com/macros/s/AKfycbwKS3uWFB-ZuF94NBRbDwkxEzvHsekAh9XvRRnpd5t2myB2mPA5pxdVw6YGBMc0sDHGZQ/exec");
+      const { ip }   = await ipRes.json();
+      
+      navigator.geolocation.getCurrentPosition(async pos => {
+        const location = `${pos.coords.latitude},${pos.coords.longitude}`;
+        
+        // your deployed Web App URL here:
+        const WEB_APP_URL = "YOUR_WEB_APP_URL";
+        
+        const res = await fetch(WEB_APP_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ name, status, timestamp, location, ip })
         });
-
-      } catch (error) {
-        alert("Something went wrong: " + error);
-      }
+        
+        const json = await res.json();
+        alert(json.success ? json.message : "Error: " + json.error);
+      }, () => alert("Location permission denied."));
     }
   </script>
 </body>
