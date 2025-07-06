@@ -39,7 +39,7 @@
         navigator.geolocation.getCurrentPosition(async (pos) => {
           const location = `${pos.coords.latitude},${pos.coords.longitude}`;
 
-          const response = await fetch("https://script.google.com/macros/s/AKfycbx-SjWkTZVbxjnRP-Bkjpo7kvtDxcy5YkOM0tbNRogc3cfPljlrUtFtb_a_5GAtIO-gMg/exec", {
+          const response = await fetch("https://script.google.com/macros/s/AKfycbwSAulpacALe2NC5gmcVkutLFoiPJ_Z3EGFzHbvOsnkQ7z8ruzUEjCl9TjTpkSf1nvplg/exec", {
   method: "POST",
   body: JSON.stringify({ name, status, timestamp, location, ip: ipData.ip })
 });
