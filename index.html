@@ -3,8 +3,16 @@
 <head>
   <title>Warehouse Attendance</title>
   <style>
-    body { font-family: Arial; text-align: center; padding: 40px; }
-    input, button { padding: 10px; margin: 10px; font-size: 1em; }
+    body {
+      font-family: Arial;
+      text-align: center;
+      padding: 40px;
+    }
+    input, button {
+      padding: 10px;
+      margin: 10px;
+      font-size: 1em;
+    }
   </style>
   <script>
     async function getIP() {
@@ -26,35 +34,38 @@
         return;
       }
 
-      navigator.geolocation.getCurrentPosition(async (pos) => {
-        const ip = await getIP();
-        const data = {
-          name: name,
-          latitude: pos.coords.latitude,
-          longitude: pos.coords.longitude,
-          timestamp: new Date().toISOString(),
-          ip: ip,
-          action: action
-        };
+      navigator.geolocation.getCurrentPosition(
+        async (pos) => {
+          const ip = await getIP();
+          const data = {
+            name: name,
+            latitude: pos.coords.latitude,
+            longitude: pos.coords.longitude,
+            timestamp: new Date().toISOString(),
+            ip: ip,
+            action: action
+          };
 
-        try {
-          await fetch("https://script.google.com/macros/s/AKfycbwSAulpacALe2NC5gmcVkutLFoiPJ_Z3EGFzHbvOsnkQ7z8ruzUEjCl9TjTpkSf1nvplg/exec", {
-            method: "POST",
-            mode: "no-cors",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(data)
-          });
+          try {
+            await fetch("https://script.google.com/macros/s/AKfycbwSAulpacALe2NC5gmcVkutLFoiPJ_Z3EGFzHbvOsnkQ7z8ruzUEjCl9TjTpkSf1nvplg/exec", {
+              method: "POST",
+              mode: "no-cors",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(data)
+            });
 
-          alert(`Check ${action === "in" ? "in" : "out"} submitted.`);
-          nameInput.value = "";
-        } catch (error) {
-          alert("There was an error submitting your attendance.");
-          console.error(error);
+            alert(`Check ${action === "in" ? "in" : "out"} submitted.`);
+            nameInput.value = "";
+          } catch (error) {
+            alert("There was an error submitting your attendance.");
+            console.error(error);
+          }
+        },
+        (err) => {
+          alert("Location permission is required.");
+          console.error("Geolocation error:", err);
         }
-      }, (err) => {
-        alert("Location permission is required.");
-        console.error("Geolocation error:", err);
-      });
+      );
     }
   </script>
 </head>
@@ -68,4 +79,3 @@
   <button onclick="handleCheck('out')">Check Out</button>
 </body>
 </html>
-
