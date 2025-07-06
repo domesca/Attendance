@@ -18,7 +18,9 @@
     }
 
     async function handleCheck(action) {
-      const name = document.getElementById("name").value;
+      const nameInput = document.getElementById("name");
+      const name = nameInput.value.trim();
+
       if (!name) {
         alert("Please enter your name");
         return;
@@ -35,15 +37,24 @@
           action: action
         };
 
-        fetch("https://script.google.com/macros/s/AKfycbwSAulpacALe2NC5gmcVkutLFoiPJ_Z3EGFzHbvOsnkQ7z8ruzUEjCl9TjTpkSf1nvplg/exec", {
-  method: "POST",
-  mode: "no-cors",
-  headers: { "Content-Type": "application/json" },
-  body: JSON.stringify(data)
-}).then(() => {
-  alert(`Check ${action === "in" ? "in" : "out"} submitted.`);
-  document.getElementById("name").value = "";
-});
+        try {
+          await fetch("https://script.google.com/macros/s/AKfycbwSAulpacALe2NC5gmcVkutLFoiPJ_Z3EGFzHbvOsnkQ7z8ruzUEjCl9TjTpkSf1nvplg/exec", {
+            method: "POST",
+            mode: "no-cors",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(data)
+          });
+
+          alert(`Check ${action === "in" ? "in" : "out"} submitted.`);
+          nameInput.value = "";
+        } catch (error) {
+          alert("There was an error submitting your attendance.");
+          console.error(error);
+        }
+      }, (err) => {
+        alert("Location permission is required.");
+        console.error("Geolocation error:", err);
+      });
     }
   </script>
 </head>
