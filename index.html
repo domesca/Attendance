@@ -36,15 +36,14 @@
         };
 
         fetch("https://script.google.com/macros/s/AKfycbwSAulpacALe2NC5gmcVkutLFoiPJ_Z3EGFzHbvOsnkQ7z8ruzUEjCl9TjTpkSf1nvplg/exec", {
-          method: "POST",
-          mode: "no-cors", // silent but reliable
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(data)
-        });
-
-        alert(`Check ${action === "in" ? "in" : "out"} submitted.`);
-        document.getElementById("name").value = "";
-      });
+  method: "POST",
+  mode: "no-cors",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify(data)
+}).then(() => {
+  alert(`Check ${action === "in" ? "in" : "out"} submitted.`);
+  document.getElementById("name").value = "";
+});
     }
   </script>
 </head>
