@@ -1,78 +1,50 @@
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
-  <title>Warehouse Attendance</title>
+  <meta charset="UTF-8">
+  <title>Across Land - Warehouse Attendance</title>
   <style>
-    body { font-family: Arial; text-align: center; padding: 40px; }
-    input, button { padding: 10px; margin: 10px; font-size: 1em; }
+    body { font-family: Arial; text-align: center; padding: 30px; }
+    input, button { margin: 10px; padding: 10px; font-size: 16px; }
   </style>
-  <script>
-    async function getIP() {
-      const res = await fetch("https://api.ipify.org?format=json");
-      const data = await res.json();
-      return data.ip;
-      try {
-        const res = await fetch("https://api.ipify.org?format=json");
-        const data = await res.json();
-        return data.ip;
-      } catch {
-        return "unknown";
-      }
-    }
-
-    function handleCheck(action) {
-    async function handleCheck(action) {
-      const name = document.getElementById("name").value;
-      if (!name) {
-        alert("Please enter your name");
-        return;
-      }
-
-      if (!navigator.geolocation) {
-        alert("Geolocation is not supported by your browser");
-        return;
-      }
-
-      navigator.geolocation.getCurrentPosition(async (position) => {
-      navigator.geolocation.getCurrentPosition(async (pos) => {
-        const ip = await getIP();
-        const data = {
-          name: name,
-          latitude: position.coords.latitude,
-          longitude: position.coords.longitude,
-          latitude: pos.coords.latitude,
-          longitude: pos.coords.longitude,
-          timestamp: new Date().toISOString(),
-          action: action,
-          ip: ip
-          ip: ip,
-          action: action
-        };
-
-        fetch("https://script.google.com/macros/s/AKfycbzVw_Wbi3v748cMbHCm4cXgsolTVu0ZmnnTwDJEYuGgvZWca9H3yBbfNNvTH6BbOp2dwg/exec", {
-          method: "POST",
-          mode: "no-cors",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          mode: "no-cors", // silent but reliable
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(data)
-        });
-
-        alert(`Checked ${action} successfully!`);
-        alert(`Check ${action === "in" ? "in" : "out"} submitted.`);
-        document.getElementById("name").value = "";
-      });
-    }
-  </script>
 </head>
 <body>
   <h2>Across Land</h2>
-  <h2>Warehouse Attendance</h2>
-  <label>Name:</label>
-  <input type="text" id="name" placeholder="Enter your name" />
-  <br><br>
+  <h3>Warehouse Attendance</h3>
+  <label for="name">Name:</label>
+  <input id="name" type="text" placeholder="Enter your name" autocomplete="name" />
   <br>
-  <button onclick="handleCheck('in')">Check In</button>
-  <button onclick="handleCheck('out')">Check Out</button>
+  <button onclick="submitAttendance('in')">Check In</button>
+  <button onclick="submitAttendance('out')">Check Out</button>
+
+  <script>
+    function submitAttendance(status) {
+      const name = document.getElementById('name').value;
+      if (!name) return alert("Please enter your name");
+
+      navigator.geolocation.getCurrentPosition(async function(position) {
+        const location = `${position.coords.latitude},${position.coords.longitude}`;
+        const timestamp = new Date().toISOString();
+
+        const ipRes = await fetch('https://api.ipify.org?format=json');
+        const ipData = await ipRes.json();
+
+        fetch('https://script.google.com/macros/s/AKfycbyT3lpAA4i7PtOnqjnugLzFsV9RXbgaAHjJmrsz-5_3eBFny7cRAxPOIoSoD7w9qlh2_A/exec', {
+          method: 'POST',
+          body: JSON.stringify({
+            name,
+            status,
+            timestamp,
+            location,
+            ip: ipData.ip
+          }),
+          headers: { 'Content-Type': 'application/json' }
+        }).then(res => alert("Submitted"))
+          .catch(err => alert("Error submitting data"));
+      }, function(err) {
+        alert("Location access denied.");
+      });
+    }
+  </script>
 </body>
+</html>
