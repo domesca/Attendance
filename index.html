@@ -11,8 +11,9 @@
 <body>
   <h2>Across Land</h2>
   <h3>Warehouse Attendance</h3>
+
   <label for="name">Name:</label>
-  <input type="text" id="name" placeholder="Enter your name" autocomplete="name">
+  <input type="text" id="name" placeholder="Enter your name" autocomplete="name" />
   <br>
   <button onclick="submitAttendance('in')">Check In</button>
   <button onclick="submitAttendance('out')">Check Out</button>
@@ -21,26 +22,31 @@
     async function submitAttendance(status) {
       const name = document.getElementById("name").value.trim();
       if (!name) return alert("Please enter your name.");
-      
+
       const timestamp = new Date().toISOString();
-      const ipRes    = await fetch("https://script.google.com/macros/s/AKfycbwKS3uWFB-ZuF94NBRbDwkxEzvHsekAh9XvRRnpd5t2myB2mPA5pxdVw6YGBMc0sDHGZQ/exec");
-      const { ip }   = await ipRes.json();
-      
+      const ipData    = await fetch("https://script.google.com/macros/s/AKfycbx-tbk1z5RoOlcHRDUuEcobUM0STa7qLtBNY3y6woPllrwx5qOPygc-TQBokjH7ZyN6LA/exec")
+                             .then(res => res.json());
+
       navigator.geolocation.getCurrentPosition(async pos => {
         const location = `${pos.coords.latitude},${pos.coords.longitude}`;
-        
-        // your deployed Web App URL here:
+
+        // Replace with your published Web App URL
         const WEB_APP_URL = "YOUR_WEB_APP_URL";
-        
+
         const res = await fetch(WEB_APP_URL, {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ name, status, timestamp, location, ip })
+          // No headers block = simple request
+          body: JSON.stringify({
+            name, status, timestamp, location, ip: ipData.ip
+          })
         });
-        
-        const json = await res.json();
-        alert(json.success ? json.message : "Error: " + json.error);
-      }, () => alert("Location permission denied."));
+
+        const text = await res.text();
+        alert(text);
+
+      }, () => {
+        alert("Location permission denied.");
+      });
     }
   </script>
 </body>
