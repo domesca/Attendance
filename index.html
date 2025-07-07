@@ -1,1 +1,40 @@
-const url = new URL("https://script.google.com/macros/s/AKfycbylfpKGqTGIlbpqAHu4sNkhv3BAPx-n4LmKOJsKovVTnTeEIjVT-M2eA9i-YZecgv3mKg/exec");
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Across Land - Warehouse Attendance</title>
+  <style>
+    body { font-family: Arial, sans-serif; text-align: center; padding: 40px; }
+    input, button { padding: 10px; margin: 10px; font-size: 1em; }
+  </style>
+  <script>
+    async function getIP() {
+      try {
+        const res = await fetch("https://api.ipify.org?format=json");
+        const data = await res.json();
+        return data.ip;
+      } catch {
+        return "unknown";
+      }
+    }
+
+    async function submitAttendance(action) {
+      const name = document.getElementById("name").value.trim();
+      if (!name) return alert("Please enter your name");
+
+      navigator.geolocation.getCurrentPosition(async (pos) => {
+        const ip = await getIP();
+
+        const url = new URL("https://script.google.com/macros/s/AKfycbylfpKGqTGIlbpqAHu4sNkhv3BAPx-n4LmKOJsKovVTnTeEIjVT-M2eA9i-YZecgv3mKg/exec"); // Replace this
+
+        url.searchParams.append("name", name);
+        url.searchParams.append("lat", pos.coords.latitude);
+        url.searchParams.append("lon", pos.coords.longitude);
+        url.searchParams.append("timestamp", new Date().toISOString());
+        url.searchParams.append("ip", ip);
+        url.searchParams.append("action", action);
+
+        try {
+          const res = await fetch(url);
+          const msg = await res.text();
+          alert(msg);
+        } catch (err
