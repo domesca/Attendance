@@ -2,6 +2,7 @@
 <html>
 <head>
   <title>Across Land - Warehouse Attendance</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
     body { font-family: Arial, sans-serif; text-align: center; padding: 40px; }
     input, button { padding: 10px; margin: 10px; font-size: 1em; }
@@ -24,7 +25,7 @@
       navigator.geolocation.getCurrentPosition(async (pos) => {
         const ip = await getIP();
 
-        const url = new URL("https://script.google.com/macros/s/AKfycbylfpKGqTGIlbpqAHu4sNkhv3BAPx-n4LmKOJsKovVTnTeEIjVT-M2eA9i-YZecgv3mKg/exec"); // Replace this
+        const url = new URL("https://script.google.com/macros/s/AKfycbylfpKGqTGIlbpqAHu4sNkhv3BAPx-n4LmKOJsKovVTnTeEIjVT-M2eA9i-YZecgv3mKg/exec");
 
         url.searchParams.append("name", name);
         url.searchParams.append("lat", pos.coords.latitude);
@@ -37,4 +38,22 @@
           const res = await fetch(url);
           const msg = await res.text();
           alert(msg);
-        } catch (err
+        } catch (err) {
+          alert("❌ Submission failed: " + err.message);
+        }
+      }, () => {
+        alert("⚠️ Could not get location. Please allow location access.");
+      });
+    }
+  </script>
+</head>
+<body>
+  <h2>Across Land</h2>
+  <h3>Warehouse Attendance</h3>
+  <label for="name">Name:</label>
+  <input type="text" id="name" placeholder="Enter your name" />
+  <br />
+  <button onclick="submitAttendance('in')">Check In</button>
+  <button onclick="submitAttendance('out')">Check Out</button>
+</body>
+</html>
