@@ -2,58 +2,112 @@
 <html>
 <head>
   <title>Across Land - Warehouse Attendance</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
   <style>
-    body { font-family: Arial, sans-serif; text-align: center; padding: 40px; }
-    input, button { padding: 10px; margin: 10px; font-size: 1em; }
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding: 40px;
+    }
+
+    input, button {
+      padding: 10px;
+      margin: 10px;
+      font-size: 16px;
+    }
   </style>
-  <script>
-    async function getIP() {
-      try {
-        const res = await fetch("https://api.ipify.org?format=json");
-        const data = await res.json();
-        return data.ip;
-      } catch {
-        return "unknown";
-      }
-    }
-
-    async function submitAttendance(action) {
-      const name = document.getElementById("name").value.trim();
-      if (!name) return alert("Please enter your name");
-
-      navigator.geolocation.getCurrentPosition(async (pos) => {
-        const ip = await getIP();
-
-        const url = new URL("https://script.google.com/macros/s/AKfycbxtEeMIPu9fsdDDZpJMX_gVIUewdMFFHw_7nYgZ3UfOAyo2caehTCrX0lLMTm-jX6iU/exec");
-
-        url.searchParams.append("name", name);
-        url.searchParams.append("lat", pos.coords.latitude);
-        url.searchParams.append("lon", pos.coords.longitude);
-        url.searchParams.append("timestamp", new Date().toISOString());
-        url.searchParams.append("ip", ip);
-        url.searchParams.append("action", action);
-
-        try {
-          const res = await fetch(url);
-          const msg = await res.text();
-          alert(msg);
-        } catch (err) {
-          alert("❌ Submission failed: " + err.message);
-        }
-      }, () => {
-        alert("⚠️ Could not get location. Please allow location access.");
-      });
-    }
-  </script>
 </head>
+
 <body>
-  <h2>Across Land</h2>
-  <h3>Warehouse Attendance</h3>
-  <label for="name">Name:</label>
-  <input type="text" id="name" placeholder="Enter your name" />
-  <br />
-  <button onclick="submitAttendance('in')">Check In</button>
-  <button onclick="submitAttendance('out')">Check Out</button>
+
+<h2>Across Land</h2>
+<h3>Warehouse Attendance</h3>
+
+<label>Name:</label>
+<input type="text" id="name" placeholder="Enter your name">
+
+<br>
+
+<button onclick="submitAttendance('in')">Check In</button>
+<button onclick="submitAttendance('out')">Check Out</button>
+
+<script>
+
+async function getIP() {
+  try {
+    const res = await fetch("https://api.ipify.org?format=json");
+    const data = await res.json();
+    return data.ip;
+  } catch {
+    return "unknown";
+  }
+}
+
+async function submitAttendance(action) {
+
+  const name = document.getElementById("name").value.trim();
+
+  if (!name) {
+    alert("Please enter your name");
+    return;
+  }
+
+  navigator.geolocation.getCurrentPosition(
+    async (pos) => {
+
+      const ip = await getIP();
+
+      const formData = new URLSearchParams();
+
+      formData.append("name", name);
+      formData.append("action", action);
+      formData.append("lat", pos.coords.latitude);
+      formData.append("lon", pos.coords.longitude);
+      formData.append("ip", ip);
+      formData.append("timestamp", new Date().toISOString());
+
+      try {
+
+        await fetch(
+          "https://script.google.com/macros/s/AKfycbxtEeMIPu9fsdDDZpJMX_gVIUewdMFFHw_7nYgZ3UfOAyo2caehTCrX0lLMTm-jX6iU/exec",
+          {
+            method: "POST",
+            mode: "no-cors",
+            body: formData
+          }
+        );
+
+        alert(
+          "Attendance submitted successfully.\n\n" +
+          "Name: " + name +
+          "\nAction: " + action
+        );
+
+      } catch (err) {
+
+        console.error(err);
+
+        alert(
+          "Submission failed:\n" +
+          err.message
+        );
+      }
+    },
+
+    () => {
+      alert("Please allow location access.");
+    },
+
+    {
+      enableHighAccuracy: true,
+      timeout: 10000,
+      maximumAge: 0
+    }
+  );
+}
+
+</script>
+
 </body>
 </html>
